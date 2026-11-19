@@ -15,24 +15,67 @@ export interface StepLogprob {
 export interface GenerationResult {
   text: string;
   tokens: StepLogprob[];
+  finishReason?: string | null;
   usage?: {
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
     tokensPerSecond?: number;
-    timeToFirstTokenMs?: number;
-    totalTimeMs?: number;
+    firstTokenTimeMs?: number;
+    durationMs?: number;
   };
 }
 
+export type PlaygroundMode =
+  | 'playground' // Full GroqCloud Playground Chat Studio
+  | 'compare' // Compare Mode (Chamber A vs Chamber B)
+  | 'missions' // Interactive Missions / Challenges
+  | '3dlab'; // Dedicated 3D Mechanism Laboratory
+
+export type Visualizer3DScene =
+  | 'pipeline'
+  | 'temperature'
+  | 'topp'
+  | 'tokenization'
+  | 'streaming'
+  | 'maxtokens'
+  | 'stopsequences'
+  | 'systemprompt'
+  | 'jsonmode'
+  | 'seed'
+  | 'compare';
+
 export type LabStation =
-  | 'microscope' // Station 1: Token Microscope
-  | 'crystalball' // Station 2: Next-Token Crystal Ball
-  | 'temperature' // Station 3: Temperature & Chaos
-  | 'context' // Station 4: Context Memory Meter
-  | 'puppet' // Station 5: System Prompt Puppet Strings
-  | 'speedometer' // Station 6: Groq LPU Speedometer
-  | 'challenges'; // Bonus: Lab Challenges & Quizzes
+  | 'microscope'
+  | 'crystalball'
+  | 'temperature'
+  | 'context'
+  | 'puppet'
+  | 'speedometer'
+  | 'challenges';
+
+export interface ChatMessage {
+  id: string;
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+  tokens?: number;
+  tokensPerSec?: number;
+  ttftMs?: number;
+  durationMs?: number;
+  finishReason?: string | null;
+  isStreaming?: boolean;
+}
+
+export interface GroqParameters {
+  model: string;
+  temperature: number;
+  topP: number;
+  maxTokens: number;
+  stream: boolean;
+  jsonMode: boolean;
+  seed: number | null;
+  stopSequences: string[];
+}
 
 export interface TokenItem {
   id: number;
