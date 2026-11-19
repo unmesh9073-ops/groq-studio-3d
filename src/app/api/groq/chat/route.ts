@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const userApiKey = req.headers.get('x-groq-api-key');
     const {
       messages,
-      model = 'llama-3.3-70b-versatile',
+      model = 'openai/gpt-oss-120b',
       temperature = 0.7,
       top_p = 1.0,
       max_tokens = 1024,

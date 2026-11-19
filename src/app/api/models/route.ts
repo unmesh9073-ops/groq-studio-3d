@@ -21,16 +21,16 @@ export async function GET(req: NextRequest) {
                 name: m.id,
                 desc: `Model ${m.id} on Groq LPUs`,
                 contextWindow: (m as unknown as { context_window?: number }).context_window || 8192,
-                tokensPerSecEstimate: 400,
+                tokensPerSecEstimate: 450,
                 tier: 'fast' as const,
               };
             });
 
-          // Ensure curated ones exist in list
+          // Ensure curated ones exist at the end for fallback/simulation
           const existingIds = new Set(fetchedFiltered.map((f) => f.id));
           for (const c of CURATED_GROQ_MODELS) {
             if (!existingIds.has(c.id)) {
-              fetchedFiltered.unshift(c);
+              fetchedFiltered.push(c);
             }
           }
           models = fetchedFiltered;

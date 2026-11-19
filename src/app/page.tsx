@@ -31,7 +31,7 @@ import { LabChallenges } from '@/components/challenges/LabChallenges';
 import { sound } from '@/lib/audio';
 
 const DEFAULT_PARAMETERS: GroqParameters = {
-  model: 'llama-3.3-70b-versatile',
+  model: 'openai/gpt-oss-120b',
   temperature: 0.7,
   topP: 1.0,
   maxTokens: 1024,
