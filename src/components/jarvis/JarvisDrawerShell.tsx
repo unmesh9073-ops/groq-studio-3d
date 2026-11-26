@@ -43,6 +43,7 @@ function getStatusLabel(status: JarvisStatus, listening: boolean): string {
 
 export function JarvisDrawerShell() {
   const theme = usePlaygroundStore((state) => state.theme)
+  const activeWorkspace = usePlaygroundStore((state) => state.activeWorkspace)
   const isJarvisOpen = usePlaygroundStore((state) => state.isJarvisOpen)
   const jarvisStatus = usePlaygroundStore((state) => state.jarvisStatus)
   const jarvisActionModeEnabled = usePlaygroundStore((state) => state.jarvisActionModeEnabled)
@@ -176,7 +177,11 @@ export function JarvisDrawerShell() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '108%', opacity: 0 }}
           transition={{ type: 'spring', bounce: 0, duration: 0.36 }}
-          className="spatial-glass-elevated select-none fixed right-4 top-[116px] lg:top-[78px] bottom-4 z-30 flex w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-[26px]"
+          className="spatial-glass-elevated select-none fixed right-4 top-16 bottom-24 z-40 flex w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-[28px] border border-[var(--glass-border)] shadow-[0_24px_60px_-14px_rgba(0,0,0,0.5)]"
+          style={{
+            backdropFilter: 'blur(28px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+          }}
         >
           {/* Header */}
           <div className="flex items-center justify-between gap-1.5 border-b border-[var(--glass-border)] px-4 py-3">
@@ -290,7 +295,17 @@ export function JarvisDrawerShell() {
                 aria-hidden="true"
               />
               <span className="truncate">
-                Seeing: <strong className="font-medium text-[var(--text-primary)]">{conceptMeta.shortLabel}</strong> ·{' '}
+                Seeing:{' '}
+                <strong className="font-medium text-[var(--text-primary)]">
+                  {activeWorkspace === 'studio'
+                    ? 'Studio'
+                    : activeWorkspace === 'lab'
+                      ? '3D Lab'
+                      : activeWorkspace === 'playground'
+                        ? 'Playground'
+                        : 'Builder'}
+                </strong>{' '}
+                · <strong className="font-medium text-[var(--text-primary)]">{conceptMeta.shortLabel}</strong> ·{' '}
                 <span className="font-mono-metric">T {temperature.toFixed(2)}</span> ·{' '}
                 <span className="font-mono-metric">{modelMeta.label}</span>
               </span>

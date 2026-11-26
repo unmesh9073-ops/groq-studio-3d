@@ -1,13 +1,17 @@
 import { lazy, Suspense } from 'react'
-import { MotionConfig } from 'framer-motion'
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { JarvisDrawerShell } from '@/components/jarvis/JarvisDrawerShell'
-import { ControlDock } from '@/components/layout/ControlDock'
 import { SettingsModal } from '@/components/layout/SettingsModal'
-import { TopNav } from '@/components/layout/TopNav'
 import { CodeExportModal } from '@/components/playground/CodeExportModal'
 import { JsonSchemaModal } from '@/components/playground/JsonSchemaModal'
-import { PromptConsole } from '@/components/playground/PromptConsole'
+import { SpatialDock } from '@/components/spatial/SpatialDock'
+import { SpatialHeader } from '@/components/spatial/SpatialHeader'
 import { GuidedTourOverlay } from '@/components/tour/GuidedTourOverlay'
+import { BuilderWorkspace } from '@/components/workspaces/BuilderWorkspace'
+import { LabWorkspace } from '@/components/workspaces/LabWorkspace'
+import { PlaygroundWorkspace } from '@/components/workspaces/PlaygroundWorkspace'
+import { StudioHub } from '@/components/workspaces/StudioHub'
+import { usePlaygroundStore } from '@/store/usePlaygroundStore'
 
 const SpatialStage = lazy(() => import('@/components/stage3d/SpatialStage'))
 
@@ -29,15 +33,72 @@ function StageLoadingBackdrop() {
 }
 
 export function App() {
+  const activeWorkspace = usePlaygroundStore((s) => s.activeWorkspace)
+
   return (
     <MotionConfig reducedMotion="user">
       <div className="studio-viewport">
         <Suspense fallback={<StageLoadingBackdrop />}>
           <SpatialStage />
         </Suspense>
-        <TopNav />
-        <ControlDock />
-        <PromptConsole />
+
+        <SpatialHeader />
+
+        <AnimatePresence mode="wait">
+          {activeWorkspace === 'studio' && (
+            <motion.div
+              key="workspace-studio"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="pointer-events-none absolute inset-0"
+            >
+              <StudioHub />
+            </motion.div>
+          )}
+
+          {activeWorkspace === 'lab' && (
+            <motion.div
+              key="workspace-lab"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="pointer-events-none absolute inset-0"
+            >
+              <LabWorkspace />
+            </motion.div>
+          )}
+
+          {activeWorkspace === 'playground' && (
+            <motion.div
+              key="workspace-playground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="pointer-events-none absolute inset-0"
+            >
+              <PlaygroundWorkspace />
+            </motion.div>
+          )}
+
+          {activeWorkspace === 'builder' && (
+            <motion.div
+              key="workspace-builder"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="pointer-events-none absolute inset-0"
+            >
+              <BuilderWorkspace />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <SpatialDock />
         <GuidedTourOverlay />
         <JarvisDrawerShell />
         <SettingsModal />

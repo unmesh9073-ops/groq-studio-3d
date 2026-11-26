@@ -28,6 +28,8 @@ export function buildStageContextSnapshot(): string {
   const s = usePlaygroundStore.getState()
   const concept = getConceptById(s.activeConcept)
   return JSON.stringify({
+    activeWorkspace: s.activeWorkspace,
+    completedChallenges: `${s.completedChallenges.length} / 7`,
     activeConcept: s.activeConcept,
     activeConceptLabel: concept.label,
     selectedHotspot: s.selectedHotspot,
@@ -50,6 +52,28 @@ export function buildStageContextSnapshot(): string {
 }
 
 export function getDynamicQuickAsks(activeConcept: ConceptId): string[] {
+  const ws = usePlaygroundStore.getState().activeWorkspace
+  if (ws === 'studio') {
+    return [
+      'Take me to Temperature 3D',
+      'Show me the Python code',
+      'Explain what I’m looking at',
+    ]
+  }
+  if (ws === 'playground') {
+    return [
+      'Run a Stop Sequence cutoff demo',
+      'Show me why high temperature makes AI ramble',
+      'Explain what I’m looking at',
+    ]
+  }
+  if (ws === 'builder') {
+    return [
+      'Explain the exported Python code',
+      'Edit the JSON schema',
+      'Explain what I’m looking at',
+    ]
+  }
   switch (activeConcept) {
     case 'temperature':
       return [

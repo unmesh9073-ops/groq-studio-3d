@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type {
   AppMode,
   BuiltInToolsConfig,
+  BuilderSubTab,
   ConceptId,
   ControlHighlightKey,
   ErrorRecoveryAction,
@@ -16,6 +17,7 @@ import type {
   ModelId,
   PlaygroundState,
   ThemeMode,
+  WorkspaceId,
 } from '@/types/playground'
 import { DEFAULT_JSON_SCHEMA_TEXT } from '@/utils/jsonSchema'
 
@@ -25,6 +27,8 @@ const STORAGE_KEYS = {
   voiceAutoSpeak: 'groq-studio-3d-voice-auto-speak',
   voiceName: 'groq-studio-3d-voice-name',
   tourCompleted: 'groq_studio_tour_completed',
+  soundEnabled: 'groq-studio-3d-sound-enabled',
+  completedChallenges: 'groq_studio_v2_challenges',
 } as const
 
 function safeReadStorage(key: string): string | null {
@@ -79,6 +83,33 @@ function getInitialVoiceName(): JarvisVoiceName {
 
 function getInitialTourCompleted(): boolean {
   return safeReadStorage(STORAGE_KEYS.tourCompleted) === 'true'
+}
+
+function getInitialSoundEnabled(): boolean {
+  const stored = safeReadStorage(STORAGE_KEYS.soundEnabled)
+  return stored === null ? true : stored === 'true'
+}
+
+const VALID_CONCEPT_IDS: ConceptId[] = [
+  'lpu-pipeline',
+  'temperature',
+  'top-p',
+  'tokens-limits',
+  'prompt-roles',
+  'structured-json',
+  'built-in-tools',
+]
+
+function getInitialCompletedChallenges(): ConceptId[] {
+  const raw = safeReadStorage(STORAGE_KEYS.completedChallenges)
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((id): id is ConceptId => VALID_CONCEPT_IDS.includes(id as ConceptId))
+  } catch {
+    return []
+  }
 }
 
 function syncDocumentTheme(theme: ThemeMode): void {
@@ -152,10 +183,15 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => {
   return {
     theme: initialTheme,
     apiKey: getInitialApiKey(),
+    activeWorkspace: 'studio',
+    activeBuilderTab: 'schema',
+    soundEnabled: getInitialSoundEnabled(),
 
     activeConcept: 'lpu-pipeline',
     selectedHotspot: null,
     cameraResetTick: 0,
+    completedChallenges: getInitialCompletedChallenges(),
+    challengeCelebrationTick: 0,
 
     ...DEFAULT_PARAMETERS,
 
@@ -205,6 +241,25 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => {
       set({ theme: next })
     },
 
+    setActiveWorkspace: (activeWorkspace: WorkspaceId) => {
+      set({ activeWorkspace })
+    },
+
+    setActiveBuilderTab: (activeBuilderTab: BuilderSubTab) => {
+      set({ activeBuilderTab })
+    },
+
+    setSoundEnabled: (soundEnabled: boolean) => {
+      safeWriteStorage(STORAGE_KEYS.soundEnabled, String(soundEnabled))
+      set({ soundEnabled })
+    },
+
+    toggleSound: () => {
+      const next = !get().soundEnabled
+      safeWriteStorage(STORAGE_KEYS.soundEnabled, String(next))
+      set({ soundEnabled: next })
+    },
+
     setApiKey: (rawKey: string) => {
       const cleaned = rawKey.trim()
       safeWriteStorage(STORAGE_KEYS.apiKey, cleaned)
@@ -222,6 +277,22 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => {
         selectedHotspot: null,
         cameraResetTick: state.cameraResetTick + 1,
       }))
+    },
+
+    completeChallenge: (conceptId: ConceptId) => {
+      const current = get().completedChallenges
+      if (current.includes(conceptId)) return
+      const next = [...current, conceptId]
+      safeWriteStorage(STORAGE_KEYS.completedChallenges, JSON.stringify(next))
+      set((state) => ({
+        completedChallenges: next,
+        challengeCelebrationTick: state.challengeCelebrationTick + 1,
+      }))
+    },
+
+    resetChallenges: () => {
+      safeWriteStorage(STORAGE_KEYS.completedChallenges, '')
+      set({ completedChallenges: [] })
     },
 
     setSelectedHotspot: (selectedHotspot: HotspotId | null) => {
@@ -513,6 +584,8 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => {
         const snap = target.preActionSnapshot
         const conceptChanged = snap.activeConcept !== state.activeConcept
         return {
+          activeWorkspace: snap.activeWorkspace ?? state.activeWorkspace,
+          activeBuilderTab: snap.activeBuilderTab ?? state.activeBuilderTab,
           activeConcept: snap.activeConcept,
           selectedHotspot: conceptChanged ? null : state.selectedHotspot,
           cameraResetTick: conceptChanged ? state.cameraResetTick + 1 : state.cameraResetTick,

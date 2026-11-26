@@ -2,6 +2,10 @@ export type ThemeMode = 'dark' | 'light'
 
 export type AppMode = 'demo' | 'live'
 
+export type WorkspaceId = 'studio' | 'lab' | 'playground' | 'builder'
+
+export type BuilderSubTab = 'schema' | 'tools' | 'code'
+
 export type ConceptId =
   | 'lpu-pipeline'
   | 'temperature'
@@ -180,6 +184,8 @@ export interface JarvisActionReceipt {
 }
 
 export interface PlaygroundActionSnapshot {
+  activeWorkspace?: WorkspaceId
+  activeBuilderTab?: BuilderSubTab
   activeConcept: ConceptId
   model: ModelId
   temperature: number
@@ -215,11 +221,16 @@ export interface PlaygroundState {
   // Appearance & Auth
   theme: ThemeMode
   apiKey: string
+  activeWorkspace: WorkspaceId
+  activeBuilderTab: BuilderSubTab
+  soundEnabled: boolean
 
   // Active 3D Educational Lens
   activeConcept: ConceptId
   selectedHotspot: HotspotId | null
   cameraResetTick: number
+  completedChallenges: ConceptId[]
+  challengeCelebrationTick: number
 
   // Playground Parameters
   model: ModelId
@@ -278,11 +289,17 @@ export interface PlaygroundState {
   // Navigation & Theme Actions
   setTheme: (theme: ThemeMode) => void
   toggleTheme: () => void
+  setActiveWorkspace: (workspace: WorkspaceId) => void
+  setActiveBuilderTab: (tab: BuilderSubTab) => void
+  setSoundEnabled: (enabled: boolean) => void
+  toggleSound: () => void
   setApiKey: (apiKey: string) => void
   clearApiKey: () => void
   setActiveConcept: (concept: ConceptId) => void
   setSelectedHotspot: (hotspot: HotspotId | null) => void
   triggerCameraReset: () => void
+  completeChallenge: (conceptId: ConceptId) => void
+  resetChallenges: () => void
 
   // Parameter Actions
   setModel: (model: ModelId) => void

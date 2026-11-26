@@ -1,13 +1,16 @@
 import { CONCEPT_LENSES, getConceptById, getHotspotsForConcept, MODEL_CATALOG } from '@/data/concepts'
 import { runPlaygroundCompletion } from '@/services/playgroundRunner'
 import { usePlaygroundStore } from '@/store/usePlaygroundStore'
+import { playGlassTap } from '@/services/soundEngine'
 import type {
+  BuilderSubTab,
   ConceptId,
   ControlHighlightKey,
   JarvisActionReceipt,
   JsonMode,
   ModelId,
   PlaygroundActionSnapshot,
+  WorkspaceId,
 } from '@/types/playground'
 
 export interface ConfigurePlaygroundArgs {
@@ -54,6 +57,14 @@ export const JARVIS_TOOL_DEFINITIONS = [
       parameters: {
         type: 'object',
         properties: {
+          activeWorkspace: {
+            type: 'string',
+            enum: ['studio', 'lab', 'playground', 'builder'],
+          },
+          builderTab: {
+            type: 'string',
+            enum: ['schema', 'tools', 'code'],
+          },
           activeConcept: {
             type: 'string',
             enum: [
@@ -227,6 +238,42 @@ export async function executeJarvisTool(
   let didMutate = false
 
   if (toolName === 'configure_playground') {
+    const VALID_WORKSPACES = new Set<string>(['studio', 'lab', 'playground', 'builder'])
+    const VALID_BUILDER_TABS = new Set<string>(['schema', 'tools', 'code'])
+
+    if (rawArgs.activeWorkspace !== undefined) {
+      if (typeof rawArgs.activeWorkspace === 'string' && VALID_WORKSPACES.has(rawArgs.activeWorkspace)) {
+        const ws = rawArgs.activeWorkspace as WorkspaceId
+        store.setActiveWorkspace(ws)
+        playGlassTap()
+        didMutate = true
+        receipts.push({
+          id: makeReceiptId(),
+          label: 'Workspace',
+          detail: ws,
+          status: 'done',
+        })
+      } else {
+        validationErrors.push(`Unknown activeWorkspace "${String(rawArgs.activeWorkspace)}".`)
+      }
+    }
+
+    if (rawArgs.builderTab !== undefined) {
+      if (typeof rawArgs.builderTab === 'string' && VALID_BUILDER_TABS.has(rawArgs.builderTab)) {
+        const tab = rawArgs.builderTab as BuilderSubTab
+        store.setActiveBuilderTab(tab)
+        didMutate = true
+        receipts.push({
+          id: makeReceiptId(),
+          label: 'Builder Tab',
+          detail: tab,
+          status: 'done',
+        })
+      } else {
+        validationErrors.push(`Unknown builderTab "${String(rawArgs.builderTab)}".`)
+      }
+    }
+
     if (rawArgs.activeConcept !== undefined) {
       if (typeof rawArgs.activeConcept === 'string' && VALID_CONCEPT_IDS.has(rawArgs.activeConcept)) {
         const conceptId = rawArgs.activeConcept as ConceptId

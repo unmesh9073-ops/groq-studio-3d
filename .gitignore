@@ -31,3 +31,4 @@ yarn-error.log*
 # Agent tooling
 .agents/
 .agent/
+.vercel

@@ -7,6 +7,7 @@ import * as THREE from 'three'
 import { getHotspotsForConcept } from '@/data/concepts'
 import { usePlaygroundStore } from '@/store/usePlaygroundStore'
 import { CameraRig } from '@/components/stage3d/CameraRig'
+import { SpatialWorld } from '@/components/stage3d/SpatialWorld'
 import { LpuCoreScene } from '@/components/stage3d/LpuCoreScene'
 import { PromptRolesScene } from '@/components/stage3d/scenes/PromptRolesScene'
 import { TemperatureScene } from '@/components/stage3d/scenes/TemperatureScene'
@@ -137,6 +138,7 @@ function checkWebGLAvailable(): boolean {
 
 export function SpatialStage() {
   const theme = usePlaygroundStore((state) => state.theme)
+  const activeWorkspace = usePlaygroundStore((state) => state.activeWorkspace)
   const activeConcept = usePlaygroundStore((state) => state.activeConcept)
   const selectedHotspot = usePlaygroundStore((state) => state.selectedHotspot)
   const topP = usePlaygroundStore((state) => state.topP)
@@ -233,8 +235,7 @@ export function SpatialStage() {
                 if (selectedHotspot) setSelectedHotspot(null)
               }}
             >
-              <color attach="background" args={[isDark ? '#05070D' : '#F5F6FA']} />
-              <fog attach="fog" args={[isDark ? '#05070D' : '#F5F6FA', 14, 28]} />
+              <SpatialWorld isDark={isDark} />
 
               {/* Soft Studio Reflection Environment for Metallic & Glass Surfaces */}
               <Environment resolution={64}>
@@ -316,7 +317,7 @@ export function SpatialStage() {
         ].join(' ')}
       >
         {/* Concept-Specific Inline Interactive Toggles / Legends */}
-        {!activeHotspot && activeConcept === 'top-p' && (
+        {activeWorkspace === 'studio' && !activeHotspot && activeConcept === 'top-p' && (
           <div
             data-testid="topp-pool-legend"
             className="pointer-events-auto spatial-pill flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11.5px] font-medium text-[var(--text-primary)]"
@@ -331,7 +332,7 @@ export function SpatialStage() {
           </div>
         )}
 
-        {!activeHotspot && activeConcept === 'structured-json' && (
+        {activeWorkspace === 'studio' && !activeHotspot && activeConcept === 'structured-json' && (
           <div
             data-testid="json-mode-stage-toggle"
             className="pointer-events-auto spatial-pill flex items-center gap-1 rounded-full p-1"
@@ -367,7 +368,7 @@ export function SpatialStage() {
           </div>
         )}
 
-        {!activeHotspot && activeConcept === 'built-in-tools' && (
+        {activeWorkspace === 'studio' && !activeHotspot && activeConcept === 'built-in-tools' && (
           <div
             data-testid="tools-stage-toggles"
             className="pointer-events-auto spatial-pill flex items-center gap-1.5 rounded-full p-1"
@@ -407,6 +408,7 @@ export function SpatialStage() {
           </div>
         )}
 
+      {activeWorkspace === 'lab' && (
         <AnimatePresence mode="wait">
           {activeHotspot ? (
             <motion.div
@@ -474,6 +476,7 @@ export function SpatialStage() {
             </motion.div>
           ) : null}
         </AnimatePresence>
+      )}
       </div>
 
       {/* Floating Glass Reset View Button */}
