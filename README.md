@@ -1,93 +1,40 @@
-Have you ever asked an AI for something simple, spoken with complete clarity, and still wondered why it refused to give you what you meant?
+# Groq Studio 3D
 
-Please, don't let it trouble you even for a moment. You see, an AI does not truly think—it merely drifts along hidden dials and blind habits running quietly beneath the surface. Once you see those little mechanisms moving before your eyes, everything becomes so remarkably simple.
+**An interactive 3D spatial playground for learning how the Groq Developer Playground and LPU™ inference work in real time.**
 
-Come in, and take your time. Here in this Groq Playground, you can watch every unseen process unfold gently in three dimensions and turn the controls at your own pace. And if an answer ever wanders astray, a quiet companion waits right beside you—never judging, only pointing softly to the gear that slipped, until the machine finally reflects the clarity you held all along.
-
-
-
-
-# 🧪⚡ GroqLab: The Interactive LLM Exploratorium
-> **Demystifying how Large Language Models actually work under the hood — powered by ultra-fast Groq LPUs.**
-
-GroqLab is a playful, tactile, and deeply educational "AI Science Lab" web application designed for complete beginners to explore how AI language models think, predict, and generate text.
-
-Instead of hiding the technology behind a standard chat box, GroqLab puts the model onto an interactive dissection table.
+Built with React 19, TypeScript, Three.js (`@react-three/fiber` + `@react-three/drei`), Framer Motion, Zustand, and an Apple Spatial Glass UI in both **Dark Obsidian** and **Light Studio** modes.
 
 ---
 
-## 🔬 The 6 Interactive Science Lab Stations
+## Key Features
 
-1. **Station 1: The Token Microscope 🔬 ("Words are an Illusion")**
-   - Uncover Byte Pair Encoding (BPE).
-   - See how words get sliced into numeric Token IDs.
-   - Crack the famous **Strawberry Paradox**: why models fail to count letters in "strawberry" unless prompted to break into single-character tokens.
-
-2. **Station 2: The Next-Token Crystal Ball 🔮 ("Logprobs & Predictions")**
-   - Peek inside the model's prediction engine using Groq `logprobs: true` and `top_logprobs: 5`.
-   - Inspect alternative words the model considered at every single millisecond.
-   - **The Multiverse Fork**: Click any alternative word to branch reality into an alternate universe!
-
-3. **Station 3: The Temperature & Chaos Dial 🎛️ ("Cold Math vs Wild Dreams")**
-   - Demystify Temperature ($T$) and Top-P (nucleus sampling).
-   - Dynamic real-time Softmax Probability Curve visualizer.
-   - **Dual-Chamber Comparator**: Run Chamber A ($T=0.0$, robot determinism) against Chamber B ($T=1.8$, chaotic fever dream) side-by-side with Groq's sub-second speed!
-
-4. **Station 4: The Context Memory Meter 🧠 ("The Infinite Amnesia Machine")**
-   - Dispel the beginner myth that AI "remembers" you.
-   - X-Ray Context Tank showing the raw accumulated token payload re-sent on every single turn.
-   - **The Amnesia Scissors**: Snip a past message out of memory and watch the AI instantly forget who you are!
-
-5. **Station 5: The System Prompt Puppet Strings 🎭 ("Steering the AI's Mind")**
-   - See how invisible instructions transform the same model into a 17th-century Pirate, a Kindergarten Teacher, or a strict JSON API.
-   - **The Vault Keeper Challenge**: Try tricky prompts to make the model leak its secret password `BANANA_BREAD`!
-
-6. **Station 6: The Groq LPU Speedometer ⚡ ("The Need for Speed")**
-   - Discover why Groq's Tensor Streaming LPUs with on-chip SRAM outperform traditional GPU clouds.
-   - Real-time Tachometer: Tokens/Second, Time-to-First-Token (TTFT), and latency.
-   - **The Great Speed Race**: Watch Human Reading (~4.5 tok/s) vs Cloud GPU (~35 tok/s) vs Groq LPU (~650+ tok/s) race in real-time!
-
-7. **Lab Quizzes & Certification 🏆**
-   - 4 hands-on challenges and quizzes with instant feedback and confetti celebrations.
+- **7 Interactive 3D Concept Diagrams:**
+  1. **LPU Pipeline** — Input emitter, deterministic on-chip SRAM LPU core, and streaming vs. batched output prisms.
+  2. **Prompt Roles** — System instructions, User prompt prism, and Assistant Prefill launch rail.
+  3. **Temperature** — Real-time 3D Softmax probability pillars showing how `0.0 → 2.0` reshapes token selection.
+  4. **Top-P (Nucleus)** — Interactive glass cutoff curtain slicing the candidate token pool.
+  5. **Token Limits** — Max Completion Tokens wall and Stop Sequence laser gate.
+  6. **JSON Schema** — Constrained decoding lattice synced live with the JSON Schema Editor.
+  7. **Built-In Tools** — Bidirectional server-side conduits for Browser Search and Python Code Sandbox (`openai/gpt-oss-*`).
+- **4-SDK Live Code Export (`⌘/Ctrl + E`):** Generates runnable **Python (`groq`)**, **TypeScript (`groq-sdk`)**, **OpenAI-compatible**, and **cURL** snippets matching every parameter, schema, and tool.
+- **J.A.R.V.I.S. Spatial Co-Pilot (`⌘/Ctrl + J`):** Context-aware assistant with **Hands-On Action Mode** (adjusts dials, spotlights controls, runs live demos, with 1-click **Undo**), **Advice Only** mode, and voice I/O (`whisper-large-v3-turbo` STT + `orpheus-v1-english` TTS, with browser speech fallback).
 
 ---
 
-## 🔒 Strict Security Architecture
-
-- **Zero Client-Side Key Exposure:** No `NEXT_PUBLIC_GROQ_API_KEY` is ever used.
-- **Server Route Handlers:** All calls to Groq API route through Next.js server proxies (`/api/groq/chat`, `/api/groq/logprobs`, `/api/groq/verify`).
-- **Bring Your Own Key (BYOK):** Users can enter their free Groq API key in the UI. It is stored strictly in browser `sessionStorage` (cleared when closing the tab) and transmitted via secure `x-groq-api-key` headers.
-- **Zero-Friction Simulation Mode:** If no key is provided, the app automatically runs in **Simulation Mode** with high-fidelity pre-computed data, ensuring anyone can explore immediately without creating an account!
-
----
-
-## 🚀 Getting Started Locally
+## Quick Start
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. (Optional) Set your Groq API key in .env.local
-echo "GROQ_API_KEY=gsk_your_key_here" > .env.local
-
-# 3. Start the dev server
 npm run dev
-
-# 4. Open in browser
-http://localhost:3000
 ```
+
+Open `http://localhost:5173` in your browser.
 
 ---
 
-## ☁️ Deploying to Vercel in 2 Minutes
+## Instant Demo Mode vs. Live Groq API Key
 
-1. Push this repository to GitHub:
-   ```bash
-   git add .
-   git commit -m "Deploy GroqLab"
-   git push origin main
-   ```
-2. Go to [vercel.com/new](https://vercel.com/new) and import your repository.
-3. Under **Environment Variables**, optionally add:
-   - `GROQ_API_KEY` = your Groq API key from [console.groq.com/keys](https://console.groq.com/keys)
-4. Click **Deploy**!
+- **Instant Demo Mode (Zero Setup):** Works immediately out of the box with no account or API key required—simulating TTFT, tokens/sec, stop sequences, structured JSON, and server-side tool traces.
+- **Live Groq API Mode:** Click **Demo Mode** (top-left) or **Settings** (gear icon) and paste a free API key from [console.groq.com/keys](https://console.groq.com/keys).
+  - **Local-Only Privacy:** Your API key is stored strictly in your browser's `localStorage` and sent only to `https://api.groq.com/openai/v1/*`.
+  - **Zero Server Env Vars Required:** All inference runs client-side, and exported SDK snippets always reference `GROQ_API_KEY` from your environment without ever embedding your key.
